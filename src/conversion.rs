@@ -373,7 +373,8 @@ impl<'lua> FromLua<'lua> for uuid::Uuid {
 impl<'lua> IntoLua<'lua> for uuid::Uuid {
     #[inline]
     fn into_lua(self, _: &'lua Lua) -> Result<Value<'lua>> {
-        Ok(Value::String(self.to_string()))
+        let uuid_string: String<'lua> = self.to_string();
+        Ok(Value::String(uuid_string))
     }
 }
 
@@ -381,12 +382,13 @@ impl<'lua> IntoLua<'lua> for uuid::Uuid {
 impl<'lua> IntoLua<'lua> for &uuid::Uuid {
     #[inline]
     fn into_lua(self, _: &'lua Lua) -> Result<Value<'lua>> {
-        Ok(Value::String(self.clone().to_string()))
+        let uuid_string: String<'lua> = self.clone().to_string();
+        Ok(Value::String(uuid_string))
     }
 
     #[inline]
     unsafe fn push_into_stack(self, lua: &'lua Lua) -> Result<()> {
-        lua.push_ref(&self.0);
+        lua.push_ref(&self);
         Ok(())
     }   
 }
