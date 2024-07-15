@@ -349,7 +349,7 @@ impl FromLua for LightUserData {
     }
 }
 
-#[cfg(feature = "uuid")]
+//#[cfg(feature = "uuid")]
 impl<'lua> IntoLua<'lua> for uuid::Uuid {
     #[inline]
     fn into_lua(self, _: &'lua Lua) -> Result<Value<'lua>> {
@@ -357,7 +357,7 @@ impl<'lua> IntoLua<'lua> for uuid::Uuid {
     }
 }
 
-#[cfg(feature = "uuid")]
+//#[cfg(feature = "uuid")]
 impl<'lua> IntoLua<'lua> for &uuid::Uuid {
     #[inline]
     fn into_lua(self, _: &'lua Lua) -> Result<Value<'lua>> {
@@ -366,25 +366,25 @@ impl<'lua> IntoLua<'lua> for &uuid::Uuid {
 
     #[inline]
     unsafe fn push_into_stack(self, lua: &'lua Lua) -> Result<()> {
-        lua.push_ref(&self.0);
+        lua.push_ref(&self.to_string().0);
         Ok(())
     }   
 }
 
-#[cfg(feature = "uuid")]
+//#[cfg(feature = "uuid")]
 impl<'lua> FromLua<'lua> for uuid::Uuid<'lua> {
     #[inline]
     fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> Result<uuid::Uuid<'lua>> {
         let ty = value.type_name();
-        let string = lua.coerce_string(value)?
+        let string_result = lua.coerce_string(value)?
             .ok_or_else(|| Error::FromLuaConversionError {
                 from: ty,
                 to: "string",
                 message: Some("expected string or number".to_string()),
             });
-        match string {
-            Ok(str) => {
-                Ok(Uuid::parse_str(str.as_str()))
+        match string_result {
+            Ok(string) => {
+                Ok(Uuid::parse_str(string.as_str()))
             },
             Err(e) => Err(e)
         }
