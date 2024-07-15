@@ -350,19 +350,19 @@ impl FromLua for LightUserData {
 }
 
 //#[cfg(feature = "uuid")]
-impl<'lua> FromLua<'lua> for uuid::Uuid<'lua> {
+impl<'lua> FromLua<'lua> for uuid::Uuid {
     #[inline]
-    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> Result<uuid::Uuid<'lua>> {
+    fn from_lua(value: Value<'lua>, lua: &'lua Lua) -> Result<uuid::Uuid> {
         let ty = value.type_name();
         let string_result = lua.coerce_string(value)?
             .ok_or_else(|| Error::FromLuaConversionError {
                 from: ty,
                 to: "string",
-                message: Some("expected string or number".to_string()),
+                message: Some("expected string uuid".to_string()),
             });
         match string_result {
             Ok(string) => {
-                Ok(Uuid::parse_str(string.as_str()))
+                Ok(Uuid::parse_str(string.to_str()))
             },
             Err(e) => Err(e)
         }
@@ -370,7 +370,7 @@ impl<'lua> FromLua<'lua> for uuid::Uuid<'lua> {
 }
 
 //#[cfg(feature = "uuid")]
-impl<'lua> IntoLua<'lua> for uuid::Uuid<'lua> {
+impl<'lua> IntoLua<'lua> for uuid::Uuid {
     #[inline]
     fn into_lua(self, _: &'lua Lua) -> Result<Value<'lua>> {
         Ok(Value::String(self.to_string()))
@@ -378,7 +378,7 @@ impl<'lua> IntoLua<'lua> for uuid::Uuid<'lua> {
 }
 
 //#[cfg(feature = "uuid")]
-impl<'lua> IntoLua<'lua> for &uuid::Uuid<'lua> {
+impl<'lua> IntoLua<'lua> for &uuid::Uuid {
     #[inline]
     fn into_lua(self, _: &'lua Lua) -> Result<Value<'lua>> {
         Ok(Value::String(self.clone().to_string()))
